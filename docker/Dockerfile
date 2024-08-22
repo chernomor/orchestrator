@@ -40,4 +40,7 @@ COPY --from=build /etc/orchestrator.conf.json /etc/orchestrator.conf.json
 
 WORKDIR /usr/local/orchestrator
 ADD docker/entrypoint.sh /entrypoint.sh
+RUN mkdir -p /etc/orchestrator/
+ADD conf/orc-topology.cnf /etc/orchestrator/orc-topology.cnf
+ADD docker/add_mysql_nodes.sh /usr/bin/add_mysql_nodes.sh
 CMD /entrypoint.sh
