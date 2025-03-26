@@ -30,7 +30,7 @@ RUN cp conf/orchestrator-sample-sqlite.conf.json /etc/orchestrator.conf.json
 
 FROM alpine:3.20
 
-RUN apk --no-cache add bash curl jq
+RUN apk --no-cache add bash curl jq util-linux-misc
 
 EXPOSE 3000
 
