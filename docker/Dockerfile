@@ -18,7 +18,7 @@ FROM golang:1.23.3-alpine3.20 as build
 
 ENV GOPATH=/tmp/go
 
-RUN apk --no-cache add libcurl rsync gcc g++ build-base bash git
+RUN apk --no-cache add libcurl rsync gcc g++ build-base bash git util-linux-misc
 
 RUN mkdir -p $GOPATH/src/github.com/openark/orchestrator
 WORKDIR $GOPATH/src/github.com/openark/orchestrator
