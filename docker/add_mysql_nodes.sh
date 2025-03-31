@@ -52,9 +52,10 @@ discover() {
 	fi
 
 	for i in {1..5}; do
-		R_CODE=$(curl -s "${ORC_HOST}/api/discover/${host}/${port}" | jq '.Code' | tr -d '"')
+		R_CODE=$(curl -s "${ORC_HOST}/api/discover/${host}/${port}" | tee /tmp/disco.resp.tmp | jq '.Code' | tr -d '"')
 		if [ "$R_CODE" == 'ERROR' ]; then
 			log ERROR "MySQL node ${host} can't be discovered"
+			cat /tmp/disco.resp.tmp
 			sleep 1
 			continue
 		else

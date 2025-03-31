@@ -121,6 +121,7 @@ var messagePrefix string
 func Respond(r render.Render, apiResponse *APIResponse) {
 	apiResponse.Message = fmt.Sprintf("%+v%+v", messagePrefix, apiResponse.Message)
 	r.JSON(apiResponse.Code.HttpStatus(), apiResponse)
+	log.Debug("Respond(%s): %s", apiResponse.Code.HttpStatus(), apiResponse.Message)
 }
 
 func setupMessagePrefix() {
