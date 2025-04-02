@@ -121,7 +121,7 @@ var messagePrefix string
 func Respond(r render.Render, apiResponse *APIResponse) {
 	apiResponse.Message = fmt.Sprintf("%+v%+v", messagePrefix, apiResponse.Message)
 	r.JSON(apiResponse.Code.HttpStatus(), apiResponse)
-	log.Debug("Respond(%s): %s", apiResponse.Code.HttpStatus(), apiResponse.Message)
+	log.Debugf("Respond(%s): %s", apiResponse.Code.HttpStatus(), apiResponse.Message)
 }
 
 func setupMessagePrefix() {
@@ -278,11 +278,14 @@ func (this *HttpAPI) Discover(params martini.Params, r render.Render, req *http.
 	}
 	instanceKey, err := this.getInstanceKey(params["host"], params["port"])
 	if err != nil {
+		log.Debugf("Discover: getInstanceKey(%s) failed: %+v", params, err)
+
 		Respond(r, &APIResponse{Code: ERROR, Message: err.Error()})
 		return
 	}
 	instance, err := inst.ReadTopologyInstance(&instanceKey)
 	if err != nil {
+		log.Debugf("Discover: ReadTopologyInstance(%s) failed: %s", instanceKey, err)
 		Respond(r, &APIResponse{Code: ERROR, Message: err.Error()})
 		return
 	}
@@ -294,6 +297,7 @@ func (this *HttpAPI) Discover(params martini.Params, r render.Render, req *http.
 	}
 
 	if instance != nil {
+		log.Debugf("Discover: Instance discovered: %+v", instance.Key)
 		Respond(r, &APIResponse{Code: OK, Message: fmt.Sprintf("Instance discovered: %+v", instance.Key), Details: instance})
 	} else {
 		Respond(r, &APIResponse{Code: OK, Message: "No instances discovered", Details: nil})
