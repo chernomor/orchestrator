@@ -91,7 +91,7 @@ func OpenTopology(host string, port int) (*sql.DB, error) {
 
 func openTopology(host string, port int, readTimeout int) (db *sql.DB, err error) {
 	log.Debugf("openTopology: Try to connect to [%s]:%s", host, port)
-	mysql_uri := fmt.Sprintf("%s:%s@tcp(%s:%d)/?timeout=%ds&readTimeout=%ds&interpolateParams=true",
+	mysql_uri := fmt.Sprintf("%s:%s@tcp([%s]:%d)/?timeout=%ds&readTimeout=%ds&interpolateParams=true",
 		config.Config.MySQLTopologyUser,
 		config.Config.MySQLTopologyPassword,
 		host, port,
