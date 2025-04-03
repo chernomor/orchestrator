@@ -208,6 +208,7 @@ func GetGenericDB(driverName, dataSourceName string, logger Logger) (*sql.DB, bo
 		if db, err := sql.Open(driverName, dataSourceName); err == nil {
 			knownDBs[dataSourceName] = db
 		} else {
+			log.Debugf("sql.Open(%s, %s) failed: %v", driverName, dataSourceName)
 			return db, exists, err
 		}
 	}

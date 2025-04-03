@@ -90,6 +90,7 @@ func OpenTopology(host string, port int) (*sql.DB, error) {
 }
 
 func openTopology(host string, port int, readTimeout int) (db *sql.DB, err error) {
+	log.Debugf("Try to connect to [%s]:%s", host, port)
 	mysql_uri := fmt.Sprintf("%s:%s@tcp(%s:%d)/?timeout=%ds&readTimeout=%ds&interpolateParams=true",
 		config.Config.MySQLTopologyUser,
 		config.Config.MySQLTopologyPassword,
@@ -104,11 +105,13 @@ func openTopology(host string, port int, readTimeout int) (db *sql.DB, err error
 	if config.Config.MySQLTopologyUseMutualTLS ||
 		(config.Config.MySQLTopologyUseMixedTLS && requiresTLS(host, port, mysql_uri)) {
 		if mysql_uri, err = SetupMySQLTopologyTLS(mysql_uri); err != nil {
+			log.Debugf("SetupMySQLTopologyTLS(%s) failed: %v", mysql_uri, err)
 			return nil, err
 		}
 	}
 	sqlUtilsLogger := SqlUtilsLogger{client_context: host + ":" + strconv.Itoa(port), backend_connection: false}
 	if db, _, err = sqlutils.GetDB(mysql_uri, sqlUtilsLogger); err != nil {
+		log.Debugf("GetDB(%s, ..) failed: %v", mysql_uri, err)
 		return nil, err
 	}
 	if config.Config.MySQLConnectionLifetimeSeconds > 0 {
