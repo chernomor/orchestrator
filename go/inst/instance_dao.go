@@ -393,7 +393,7 @@ func ReadTopologyInstanceBufferable(instanceKey *InstanceKey, bufferWrites bool,
 	db, err := db.OpenDiscovery(instanceKey.Hostname, instanceKey.Port)
 	if err != nil {
 		latency.Stop("instance")
-		log.Debugf("ReadTopologyInstanceBufferable: OpenDiscovery(%+v %s) failed: %v", instanceKey, instanceKey.Port, err)
+		log.Debugf("ReadTopologyInstanceBufferable: db.OpenDiscovery(%+v %s) failed: %v", instanceKey, instanceKey.Port, err)
 		DeadInstancesFilter.RegisterInstance(instanceKey)
 		goto Cleanup
 	}
@@ -405,10 +405,12 @@ func ReadTopologyInstanceBufferable(instanceKey *InstanceKey, bufferWrites bool,
 	err = db.Ping()
 	if err != nil {
 		DeadInstancesFilter.RegisterInstance(instanceKey)
+		log.Debugf("ReadTopologyInstanceBufferable: db.Ping(%+v %s) failed: %v", instanceKey, instanceKey.Port, err)
 		goto Cleanup
 	}
 	latency.Stop("instance")
 	DeadInstancesFilter.UnregisterInstance(instanceKey)
+	log.Debugf("ReadTopologyInstanceBufferable: checkMaxScale for %+v", instanceKey)
 
 	if isMaxScale, resolvedHostname, err = instance.checkMaxScale(db, latency); err != nil {
 		// We do not "goto Cleanup" here, although it should be the correct flow.
@@ -420,9 +422,11 @@ func ReadTopologyInstanceBufferable(instanceKey *InstanceKey, bufferWrites bool,
 
 		// Certain errors are not recoverable (for this discovery process) so it's fine to go to Cleanup
 		if unrecoverableError(err) {
+			log.Debugf("ReadTopologyInstanceBufferable: checkMaxScale  unrecoverableError: %v", err)
 			goto Cleanup
 		}
 	}
+	log.Debugf("ReadTopologyInstanceBufferable: isMaxScale: %v", isMaxScale)
 
 	latency.Start("instance")
 	if isMaxScale {
@@ -447,6 +451,7 @@ func ReadTopologyInstanceBufferable(instanceKey *InstanceKey, bufferWrites bool,
 		// NOT MaxScale
 		err = db.QueryRow("select @@global.version").Scan(&instance.Version)
 		if err != nil {
+			log.Debugf("ReadTopologyInstanceBufferable: db.QueryRow(select @@global.version) failed: %v", err)
 			goto Cleanup
 		}
 	}
